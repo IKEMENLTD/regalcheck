@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import FileUploader from '@/components/FileUploader';
 import RiskReport from '@/components/RiskReport';
+import DisclaimerModal from '@/components/DisclaimerModal';
 import { AnalysisResult } from '@/lib/types';
+
+// 動的レンダリングを強制
+export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -59,44 +64,40 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      {/* 背景装飾 */}
+    <>
+      <DisclaimerModal />
+      <div className="min-h-screen bg-gray-50">
+        {/* 背景装飾 - より控えめに */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gray-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
       </div>
 
       <div className="relative xs:px-4 sm:px-6 md:px-8 lg:px-12 xs:py-8 sm:py-12 md:py-16 lg:py-20">
         <div className="max-w-5xl mx-auto">
           {/* ヘッダー */}
           <div className="text-center mb-8 sm:mb-10 md:mb-14 lg:mb-16 animate-fade-in">
-            <div className="inline-block mb-4 sm:mb-6">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur-lg opacity-20"></div>
-                <h1 className="relative xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-3 sm:mb-4 tracking-tight">
-                  契約書リスクチェッカー
-                </h1>
-              </div>
-            </div>
-            <p className="xs:text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 font-medium max-w-2xl mx-auto leading-relaxed">
+            <h1 className="xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-800 mb-3 sm:mb-4 tracking-tight">
+              契約書リスクチェッカー
+            </h1>
+            <p className="xs:text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
               AI搭載の高精度分析で、契約書に潜むリスクを瞬時に発見
             </p>
             <div className="mt-4 sm:mt-6 flex items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500">
               <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>無料</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                 </svg>
                 <span>約10秒で分析</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>データ保存なし</span>
@@ -128,9 +129,9 @@ export default function Home() {
               )}
 
               {/* 使い方セクション */}
-              <div className="bg-white border border-gray-100 rounded-2xl xs:p-6 sm:p-8 md:p-10 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                <h2 className="xs:text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4 sm:mb-6 md:mb-8 flex items-center xs:gap-2 sm:gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="bg-white border border-gray-200 rounded-xl xs:p-6 sm:p-8 md:p-10 shadow-md">
+                <h2 className="xs:text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 md:mb-8 flex items-center xs:gap-2 sm:gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-600 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
@@ -138,8 +139,8 @@ export default function Home() {
                   使い方
                 </h2>
                 <ol className="space-y-4 sm:space-y-5 md:space-y-6">
-                  <li className="flex items-start xs:gap-3 sm:gap-4 md:gap-5 group">
-                    <span className="flex-shrink-0 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl flex items-center justify-center xs:text-sm sm:text-base md:text-lg font-bold shadow-lg group-hover:scale-110 transition-transform duration-200">
+                  <li className="flex items-start xs:gap-3 sm:gap-4 md:gap-5">
+                    <span className="flex-shrink-0 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-slate-600 text-white rounded-lg flex items-center justify-center xs:text-sm sm:text-base md:text-lg font-bold">
                       1
                     </span>
                     <div className="flex-1 pt-1">
@@ -147,12 +148,12 @@ export default function Home() {
                         契約書ファイルをアップロード
                       </p>
                       <p className="xs:text-xs sm:text-sm text-gray-600">
-                        PDF、DOCX、TXT形式に対応（最大10MB）
+                        PDF、DOCX、TXT形式に対応（最大50MB）
                       </p>
                     </div>
                   </li>
-                  <li className="flex items-start xs:gap-3 sm:gap-4 md:gap-5 group">
-                    <span className="flex-shrink-0 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl flex items-center justify-center xs:text-sm sm:text-base md:text-lg font-bold shadow-lg group-hover:scale-110 transition-transform duration-200">
+                  <li className="flex items-start xs:gap-3 sm:gap-4 md:gap-5">
+                    <span className="flex-shrink-0 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-slate-600 text-white rounded-lg flex items-center justify-center xs:text-sm sm:text-base md:text-lg font-bold">
                       2
                     </span>
                     <div className="flex-1 pt-1">
@@ -164,8 +165,8 @@ export default function Home() {
                       </p>
                     </div>
                   </li>
-                  <li className="flex items-start xs:gap-3 sm:gap-4 md:gap-5 group">
-                    <span className="flex-shrink-0 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl flex items-center justify-center xs:text-sm sm:text-base md:text-lg font-bold shadow-lg group-hover:scale-110 transition-transform duration-200">
+                  <li className="flex items-start xs:gap-3 sm:gap-4 md:gap-5">
+                    <span className="flex-shrink-0 xs:w-8 xs:h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-slate-600 text-white rounded-lg flex items-center justify-center xs:text-sm sm:text-base md:text-lg font-bold">
                       3
                     </span>
                     <div className="flex-1 pt-1">
@@ -278,6 +279,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }
