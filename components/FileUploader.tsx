@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { validateFile } from '@/lib/fileParser';
+import { validateFile } from '@/lib/fileValidator';
 
 interface FileUploaderProps {
   onFileSelect: (file: File) => void;
@@ -91,10 +91,10 @@ export default function FileUploader({ onFileSelect }: FileUploaderProps) {
           <div className={`
             xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28
             mb-4 sm:mb-6 md:mb-8
-            bg-gradient-to-br from-blue-500 to-purple-600
+            bg-slate-600
             rounded-2xl
             flex items-center justify-center
-            shadow-xl
+            shadow-lg
             transform transition-transform duration-300
             ${isDragging ? 'scale-110' : 'hover:scale-105'}
           `}>
@@ -115,7 +115,7 @@ export default function FileUploader({ onFileSelect }: FileUploaderProps) {
 
           {/* テキスト */}
           <div className="text-center space-y-2 sm:space-y-3">
-            <p className="xs:text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2 xs:px-4">
+            <p className="xs:text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-800 mb-2 xs:px-4">
               {isDragging ? 'ここにドロップ' : 'ファイルをドロップまたはクリック'}
             </p>
             <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap xs:px-4">
@@ -139,7 +139,7 @@ export default function FileUploader({ onFileSelect }: FileUploaderProps) {
               </span>
             </div>
             <p className="xs:text-xs sm:text-sm text-gray-500 xs:px-4">
-              最大10MB
+              最大50MB
             </p>
           </div>
         </label>

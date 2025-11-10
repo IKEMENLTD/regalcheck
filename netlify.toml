@@ -9,5 +9,5 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
 
-# 環境変数（Netlify管理画面で設定してください）
-# ANTHROPIC_API_KEY = "your_api_key_here"
+# 環境変数(Netlify管理画面で設定してください)
+# GOOGLE_API_KEY = "your_google_api_key_here"

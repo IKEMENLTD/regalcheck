@@ -4,6 +4,10 @@ import { parseFile } from './fileParser';
 import { AnalyzeResponse } from '@/lib/types';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 
+// Node.js Runtimeを使用（pdf-parseにはNode.js APIが必要）
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     console.log('📝 API /analyze called');

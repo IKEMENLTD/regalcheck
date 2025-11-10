@@ -8,7 +8,7 @@ import { AnalysisResult } from '@/lib/types';
 
 // 動的レンダリングを強制
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
+// Note: Edge Runtimeはpdf-parseと互換性がないため、Node.js Runtimeを使用
 
 export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
