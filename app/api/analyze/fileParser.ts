@@ -1,65 +1,56 @@
-// サーバー側専用: Node.js Bufferを使用
-// pdf-parseを使用（純粋なNode.jsライブラリ）
+import mammoth from 'mammoth';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
+// サーバー側専用: Node.js Bufferを使用
 export async function parseFile(buffer: Buffer, fileType: string): Promise<string> {
   if (fileType === 'application/pdf') {
     try {
-      console.log('🔍 Starting PDF parsing with pdf-parse...');
+      console.log('🔍 Starting PDF parsing with pdfjs-dist...');
       console.log('📦 Buffer size:', buffer.length, 'bytes');
 
-      // pdf-parseを動的にインポート（サーバーサイドでのみ実行）
-      // IMPORTANT: 正しいインポート構文
-      const pdfParse = await import('pdf-parse');
-      const { PDFParse } = pdfParse;
+      // PDF.js用の設定
+      const loadingTask = pdfjsLib.getDocument({
+        data: new Uint8Array(buffer),
+        useSystemFonts: true,
+      });
 
-      console.log('📦 Creating PDFParse instance...');
+      const pdf = await loadingTask.promise;
+      console.log('✅ PDF loaded successfully');
+      console.log('📄 Number of pages:', pdf.numPages);
 
-      // PDFParseインスタンスを作成
-      const parser = new PDFParse({ data: buffer });
+      let fullText = '';
 
-      console.log('📦 Extracting text from PDF...');
-
-      // getTextメソッドでテキストを抽出
-      const result = await parser.getText();
-
-      console.log('📄 PDF loaded successfully');
-      console.log('  📊 Pages:', result.total);
-      console.log('  📝 Text length:', result.text.length, 'characters');
-
-      const fullText = result.text;
+      // 各ページのテキストを抽出
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ');
+        fullText += pageText + '\n';
+      }
 
       if (!fullText || fullText.trim().length === 0) {
-        throw new Error('PDFからテキストを抽出できませんでした。画像のみのPDFの可能性があります。');
+        throw new Error('PDFからテキストを抽出できませんでした。スキャンされた画像PDFの可能性があります。');
       }
 
-      console.log('✅ PDF parsed successfully, total text length:', fullText.length);
-
-      // クリーンアップ
-      await parser.destroy();
-
-      return fullText.trim();
+      console.log('✅ PDF text extracted, length:', fullText.length);
+      return fullText;
     } catch (error) {
       console.error('❌ PDF parsing error:', error);
-      if (error instanceof Error) {
-        throw new Error(`PDFの解析エラー: ${error.message}`);
-      }
-      throw new Error('PDFファイルの解析に失敗しました。ファイルが破損している可能性があります。');
+      throw new Error(`PDFの解析エラー: ${error instanceof Error ? error.message : String(error)}`);
     }
-  } else if (
-    fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-    fileType === 'application/msword'
-  ) {
-    console.log('📄 Parsing DOCX/DOC file...');
-    const mammoth = await import('mammoth');
-    const result = await mammoth.extractRawText({ buffer });
-    console.log('✅ DOCX parsed, text length:', result.value.length);
-    return result.value;
+  } else if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    try {
+      console.log('📄 Parsing DOCX file...');
+      const result = await mammoth.extractRawText({ buffer });
+      return result.value;
+    } catch (error) {
+      throw new Error(`DOCXの解析エラー: ${error instanceof Error ? error.message : String(error)}`);
+    }
   } else if (fileType === 'text/plain') {
-    console.log('📄 Parsing TXT file...');
-    const text = buffer.toString('utf-8');
-    console.log('✅ TXT parsed, text length:', text.length);
-    return text;
+    return buffer.toString('utf-8');
   } else {
-    throw new Error('サポートされていないファイル形式です。PDF, DOCX, TXTのみ対応しています。');
+    throw new Error(`サポートされていないファイル形式: ${fileType}`);
   }
 }
