@@ -6,8 +6,9 @@ export async function parseFile(buffer: Buffer, fileType: string): Promise<strin
   if (fileType === 'application/pdf') {
     try {
       // サーバーレス環境用: Workerを完全に無効化（関数内で毎回設定）
+      // CRITICAL: 空文字列''ではなく、ダミー文字列'disabled'を設定
       if (typeof pdfjsLib.GlobalWorkerOptions !== 'undefined') {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'disabled';
       }
 
       console.log('🔍 Starting PDF parsing with pdfjs-dist...');
