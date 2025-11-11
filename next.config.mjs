@@ -16,10 +16,11 @@ const nextConfig = {
     if (isServer) {
       config.externals.push('pdf-parse');
       config.externals.push('@napi-rs/canvas');
-      config.externals.push('pdfjs-dist');
+      // pdfjs-distはバンドルする（externalにしない）
     } else {
       // クライアントサイドでは完全にブロック
       config.resolve.alias['pdf-parse'] = false;
+      config.resolve.alias['pdfjs-dist'] = false;
     }
 
     return config;
@@ -29,7 +30,8 @@ const nextConfig = {
     unoptimized: true,
   },
   // サーバーコンポーネントでのNode.js パッケージを許可（Next.js 16+）
-  serverExternalPackages: ['pdf-parse', 'canvas', '@napi-rs/canvas', 'pdfjs-dist'],
+  // pdfjs-distはバンドルするのでserverExternalPackagesから除外
+  serverExternalPackages: ['pdf-parse', 'canvas', '@napi-rs/canvas'],
 };
 
 export default nextConfig;

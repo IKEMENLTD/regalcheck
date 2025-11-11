@@ -2,7 +2,10 @@ import mammoth from 'mammoth';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 // サーバーレス環境用: Workerを完全に無効化
-pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+// 空文字列ではなくfalseを設定してworkerを無効化
+if (typeof pdfjsLib.GlobalWorkerOptions !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = false as any;
+}
 
 // サーバー側専用: Node.js Bufferを使用
 export async function parseFile(buffer: Buffer, fileType: string): Promise<string> {
@@ -21,7 +24,8 @@ export async function parseFile(buffer: Buffer, fileType: string): Promise<strin
         disableStream: true,
         standardFontDataUrl: undefined,
         cMapUrl: undefined,
-        worker: null as any,
+        // verbosityレベルを0に設定してデバッグ出力を抑制
+        verbosity: 0,
       });
 
       const pdf = await loadingTask.promise;
