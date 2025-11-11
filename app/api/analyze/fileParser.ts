@@ -1,6 +1,9 @@
 import mammoth from 'mammoth';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
+// サーバーレス環境用: Workerを無効化
+pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+
 // サーバー側専用: Node.js Bufferを使用
 export async function parseFile(buffer: Buffer, fileType: string): Promise<string> {
   if (fileType === 'application/pdf') {
@@ -8,10 +11,14 @@ export async function parseFile(buffer: Buffer, fileType: string): Promise<strin
       console.log('🔍 Starting PDF parsing with pdfjs-dist...');
       console.log('📦 Buffer size:', buffer.length, 'bytes');
 
-      // PDF.js用の設定
+      // PDF.js用の設定（サーバーレス環境用: Workerを無効化）
       const loadingTask = pdfjsLib.getDocument({
         data: new Uint8Array(buffer),
         useSystemFonts: true,
+        useWorkerFetch: false,
+        isEvalSupported: false,
+        disableAutoFetch: true,
+        disableStream: true,
       });
 
       const pdf = await loadingTask.promise;
