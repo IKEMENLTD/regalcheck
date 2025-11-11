@@ -5,13 +5,11 @@ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 export async function parseFile(buffer: Buffer, fileType: string): Promise<string> {
   if (fileType === 'application/pdf') {
     try {
-      // サーバーレス環境用: Workerを完全に無効化（関数内で毎回設定）
-      // CRITICAL: 空文字列''ではなく、ダミー文字列'disabled'を設定
-      if (typeof pdfjsLib.GlobalWorkerOptions !== 'undefined') {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'disabled';
-      }
+      // CRITICAL FIX: Workerを完全に無効化（Vercel/Lambdaなどのサーバーレス環境で必須）
+      // disableWorkerを使用することで、GlobalWorkerOptions.workerSrcの設定が不要になる
+      (pdfjsLib as any).disableWorker = true;
 
-      console.log('🔍 Starting PDF parsing with pdfjs-dist...');
+      console.log('🔍 Starting PDF parsing with pdfjs-dist (worker disabled)...');
       console.log('📦 Buffer size:', buffer.length, 'bytes');
 
       // PDF.js用の設定（サーバーレス環境用: Workerを完全に無効化）
