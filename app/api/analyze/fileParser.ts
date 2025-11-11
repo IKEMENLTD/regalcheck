@@ -9,8 +9,22 @@ export async function parseFile(buffer: Buffer, fileType: string): Promise<strin
       // 初回のみpdfjs-distを動的ロード
       if (!pdfjsLib) {
         pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-        // ESM importの結果がfrozenなので、disableWorkerは設定できない
-        // 代わりにworkerSrcを設定せず、getDocumentのオプションでworker無効化
+
+        // CRITICAL: GlobalWorkerOptionsを強制的に無効化（try-catchでエラー無視）
+        try {
+          // 方法1: disableWorkerプロパティを設定
+          (pdfjsLib as any).disableWorker = true;
+        } catch (e1) {
+          try {
+            // 方法2: GlobalWorkerOptions.workerSrcを空文字に設定
+            if (pdfjsLib.GlobalWorkerOptions) {
+              (pdfjsLib.GlobalWorkerOptions as any).workerSrc = '';
+            }
+          } catch (e2) {
+            // 両方失敗した場合は getDocument のオプションに頼る
+            console.warn('⚠️ Could not disable worker via properties, relying on getDocument options');
+          }
+        }
       }
 
       console.log('🔍 Starting PDF parsing with pdfjs-dist (worker disabled via options)...');
