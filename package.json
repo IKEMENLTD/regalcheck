@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "npm install @netlify/plugin-nextjs --legacy-peer-deps"
+    "lint": "next lint"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -16,7 +15,6 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
     "@google/generative-ai": "^0.24.1",
-    "@netlify/plugin-nextjs": "^5.14.5",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
