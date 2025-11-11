@@ -24,8 +24,6 @@ export async function parseFile(buffer: Buffer, fileType: string): Promise<strin
         disableStream: true,
         standardFontDataUrl: undefined,
         cMapUrl: undefined,
-        // Workerを明示的に無効化
-        worker: null,
         // verbosityレベルを0に設定してデバッグ出力を抑制
         verbosity: 0,
       });
