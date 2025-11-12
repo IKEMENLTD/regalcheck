@@ -10,19 +10,31 @@ export async function parseFile(buffer: Buffer, fileType: string): Promise<strin
       if (!pdfjsLib) {
         pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
 
-        // CRITICAL: GlobalWorkerOptionsを強制的に無効化（try-catchでエラー無視）
+        // CRITICAL: GlobalWorkerOptionsを強制的に設定（try-catchでエラー無視）
+        // 空文字やundefinedは "not specified" 扱いされるため、ダミーパスを設定
         try {
-          // 方法1: disableWorkerプロパティを設定
-          (pdfjsLib as any).disableWorker = true;
+          // 方法1: workerSrcにダミーパスを設定してworker読み込みを回避
+          if (pdfjsLib.GlobalWorkerOptions) {
+            // false を設定することでworker初期化をスキップ
+            Object.defineProperty(pdfjsLib.GlobalWorkerOptions, 'workerSrc', {
+              value: false,
+              writable: true,
+              configurable: true
+            });
+          }
         } catch (e1) {
           try {
-            // 方法2: GlobalWorkerOptions.workerSrcを空文字に設定
+            // 方法2: 通常のプロパティ代入（frozen objectでは失敗）
             if (pdfjsLib.GlobalWorkerOptions) {
-              (pdfjsLib.GlobalWorkerOptions as any).workerSrc = '';
+              (pdfjsLib.GlobalWorkerOptions as any).workerSrc = false;
             }
           } catch (e2) {
-            // 両方失敗した場合は getDocument のオプションに頼る
-            console.warn('⚠️ Could not disable worker via properties, relying on getDocument options');
+            // 方法3: disableWorkerプロパティを設定
+            try {
+              (pdfjsLib as any).disableWorker = true;
+            } catch (e3) {
+              console.warn('⚠️ All worker disable methods failed, relying on getDocument options only');
+            }
           }
         }
       }
