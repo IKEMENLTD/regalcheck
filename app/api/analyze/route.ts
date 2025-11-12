@@ -4,22 +4,46 @@ import { parseFile } from './fileParser';
 import { AnalyzeResponse } from '@/lib/types';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 
-// Node.js Runtimeを使用（pdf-parseにはNode.js APIが必要）
+// Node.js Runtimeを使用（unpdf にはNode.js APIが必要）
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// セキュリティヘッダーのヘルパー関数
+function getSecurityHeaders() {
+  return {
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;",
+  };
+}
+
+// 入力サニタイゼーション（XSS対策）
+function sanitizeInput(input: string): string {
+  // HTMLタグを除去
+  return input
+    .replace(/<script[^>]*>.*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/[<>]/g, '')
+    .trim();
+}
+
 export async function POST(request: NextRequest) {
+  const securityHeaders = getSecurityHeaders();
+
   try {
-    console.log('📝 API /analyze called');
+    console.log('[INFO] API /analyze called');
 
     // レート制限チェック
     const clientIp = getClientIp(request);
-    console.log('🔒 Client IP:', clientIp);
+    console.log('[INFO] Client identifier:', clientIp.substring(0, 20) + '...');
 
     const rateLimitResult = checkRateLimit(clientIp);
 
     // レート制限ヘッダーを追加
     const headers = {
+      ...securityHeaders,
       'X-RateLimit-Limit': rateLimitResult.limit.toString(),
       'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
       'X-RateLimit-Reset': new Date(rateLimitResult.reset).toISOString(),
@@ -36,39 +60,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Rate limit check passed. Remaining:', rateLimitResult.remaining);
+    console.log('[INFO] Rate limit check passed. Remaining:', rateLimitResult.remaining);
     const body = await request.json();
-    const { fileData, fileName, fileType } = body;
+    let { fileData, fileName, fileType } = body;
 
-    console.log('📄 File info:', { fileName, fileType, dataLength: fileData?.length });
+    // 入力サニタイゼーション
+    fileName = sanitizeInput(fileName || 'unknown');
+
+    console.log('[INFO] File info:', { fileName, fileType, dataLength: fileData?.length });
 
     if (!fileData || typeof fileData !== 'string') {
-      console.error('❌ Invalid file data');
+      console.log('[WARN] Invalid file data format');
       return NextResponse.json<AnalyzeResponse>(
         { success: false, error: 'ファイルデータが不正です。' },
-        { status: 400 }
+        { status: 400, headers: securityHeaders }
       );
     }
 
     // Base64からBufferに変換
-    console.log('🔄 Converting base64 to buffer...');
+    console.log('[INFO] Converting base64 to buffer...');
     const buffer = Buffer.from(fileData, 'base64');
-    console.log('✅ Buffer created, size:', buffer.length, 'bytes');
+    console.log('[INFO] Buffer created, size:', buffer.length, 'bytes');
 
     // ファイルを解析してテキストを取得
     let fileContent: string;
     try {
-      console.log('📖 Parsing file...');
+      console.log('[INFO] Parsing file...');
       fileContent = await parseFile(buffer, fileType);
-      console.log('✅ File parsed, content length:', fileContent.length, 'characters');
+      console.log('[INFO] File parsed successfully, content length:', fileContent.length);
     } catch (parseError) {
-      console.error('❌ Parse error:', parseError);
+      // エラーメッセージを簡略化（内部詳細を隠す）
+      console.error('[ERROR] Parse failed:', parseError);
       return NextResponse.json<AnalyzeResponse>(
         {
           success: false,
-          error: parseError instanceof Error ? parseError.message : 'ファイルの解析に失敗しました。',
+          error: 'ファイルの解析に失敗しました。ファイル形式が正しいか確認してください。',
         },
-        { status: 400 }
+        { status: 400, headers: securityHeaders }
       );
     }
 
@@ -96,13 +124,14 @@ export async function POST(request: NextRequest) {
       { headers }
     );
   } catch (error) {
-    console.error('Analysis error:', error);
+    // エラーの詳細はログのみに記録（クライアントには一般的なメッセージ）
+    console.error('[ERROR] Analysis failed:', error);
     return NextResponse.json<AnalyzeResponse>(
       {
         success: false,
-        error: error instanceof Error ? error.message : '分析中にエラーが発生しました。',
+        error: '分析中にエラーが発生しました。しばらくしてから再度お試しください。',
       },
-      { status: 500 }
+      { status: 500, headers: securityHeaders }
     );
   }
 }

@@ -4,6 +4,10 @@ import './globals.css';
 export const metadata: Metadata = {
   title: '契約書リスクチェッカー - AIで契約書の落とし穴を発見',
   description: '契約書の一般的な法的リスクを自動検出し、利用者に警告を提供する無料Webサービス',
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

@@ -21,13 +21,25 @@ npm install
 
 ### 2. 環境変数の設定
 
-`.env.local` ファイルを作成し、Claude APIキーを設定してください：
+`.env.example` をコピーして `.env.local` ファイルを作成し、Google Gemini APIキーを設定してください：
 
 ```bash
-ANTHROPIC_API_KEY=your_api_key_here
+cp .env.example .env.local
 ```
 
-APIキーは [Anthropic Console](https://console.anthropic.com/) で取得できます。
+`.env.local` を編集：
+
+```bash
+GOOGLE_API_KEY=your_actual_google_api_key_here
+```
+
+**APIキーの取得方法:**
+- Google Gemini API: [Google AI Studio](https://aistudio.google.com/app/apikey)
+
+**⚠️ セキュリティ警告:**
+- `.env.local` ファイルは絶対にGitにコミットしないでください（.gitignoreで除外済み）
+- 本番環境ではVercelの環境変数設定を使用してください
+- 定期的にAPIキーをローテーションしてください
 
 ### 3. 開発サーバーの起動
 
@@ -45,10 +57,11 @@ npm run dev
 
 ## 技術スタック
 
-- **フロントエンド**: Next.js 14 (App Router), TypeScript, Tailwind CSS
+- **フロントエンド**: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4
 - **バックエンド**: Next.js API Routes
-- **AI**: Anthropic Claude API
-- **ファイル解析**: pdf-parse, mammoth
+- **AI**: Google Gemini 2.0 Flash
+- **ファイル解析**: unpdf (PDF), mammoth (DOCX)
+- **セキュリティ**: Rate Limiting (5回/日/IP), ファイル自動削除
 
 ## プロジェクト構成
 
@@ -94,9 +107,11 @@ npm run dev
 
 **簡単な手順:**
 1. GitHubにリポジトリを作成してプッシュ
-2. Netlifyアカウントでリポジトリをインポート
-3. 環境変数 `ANTHROPIC_API_KEY` を設定
+2. Vercelアカウントでリポジトリをインポート
+3. 環境変数 `GOOGLE_API_KEY` を設定
 4. 自動でビルド＆デプロイ完了
+
+**⚠️ 重要:** 本番環境にデプロイする前に、必ずセキュリティ脆弱性を修正してください
 
 ## ライセンス
 
