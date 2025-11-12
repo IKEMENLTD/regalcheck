@@ -271,10 +271,7 @@ export default function Home() {
               <span className="font-bold text-gray-800">契約書リスクチェッカー</span>
             </div>
             <p className="xs:text-xs sm:text-sm text-gray-500">
-              © 2025 Contract Risk Checker - Powered by{' '}
-              <span className="font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Claude AI
-              </span>
+              © 2025 Contract Risk Checker. All rights reserved.
             </p>
           </div>
         </div>
