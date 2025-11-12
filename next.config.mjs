@@ -32,8 +32,8 @@ const nextConfig = {
     unoptimized: true,
   },
   // サーバーコンポーネントでのNode.js パッケージを許可（Next.js 16+）
-  // CRITICAL: pdfjs-distを追加してVercel/Lambdaでのworker問題を回避
-  serverExternalPackages: ['pdf-parse', 'canvas', '@napi-rs/canvas', 'pdfjs-dist'],
+  // unpdf: サーバーレス最適化されたPDF.js（worker不要）
+  serverExternalPackages: ['pdf-parse', 'canvas', '@napi-rs/canvas', 'unpdf'],
 };
 
 export default nextConfig;
