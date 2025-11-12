@@ -10,7 +10,9 @@ export async function parseFile(buffer: Buffer, fileType: string): Promise<strin
 
       // unpdf: サーバーレス環境専用のPDF.js再配布版を使用
       // worker不要、Vercel/Lambda/Cloudflare Workers対応
-      const { text } = await extractText(buffer, { mergePages: true });
+      // Buffer → Uint8Array変換が必要
+      const uint8Array = new Uint8Array(buffer);
+      const { text } = await extractText(uint8Array, { mergePages: true });
 
       if (!text || text.trim().length === 0) {
         throw new Error('PDFからテキストを抽出できませんでした。スキャンされた画像PDFの可能性があります。');
